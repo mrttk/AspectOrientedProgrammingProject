@@ -3,6 +3,7 @@ using Entities.Concrete;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace DataAccess.Concrete.InMemory
@@ -22,14 +23,18 @@ namespace DataAccess.Concrete.InMemory
             };
         }
 
-        public List<Product> GetAll()
+        public List<Product> GetAll(Expression<Func<Product, bool>> predicate = null)
         {
-            return _products;
+            //return predicate == null
+            //    ? _products
+            //    : _products.Where(predicate).ToList();
+            return null;
         }
 
-        public List<Product> GetAllByCategory(int categoryId)
+        public Product Get(Expression<Func<Product, bool>> predicate)
         {
-            return _products.Where(p => p.CategoryId == categoryId).ToList();
+            //return _products.SingleOrDefault(predicate);
+            return null;
         }
 
         public void Add(Product product)
