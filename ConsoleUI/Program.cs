@@ -11,7 +11,7 @@ namespace ConsoleUI
         static void Main(string[] args)
         {
             ProductManager productManager = new ProductManager(new EfProductDal());
-            var products = productManager.GetByUnitPrice(50,75);
+            var products = productManager.GetAll();
 
             ConsoleTable.From(products).Write();
         }
