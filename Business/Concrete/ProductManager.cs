@@ -1,4 +1,6 @@
 ﻿using Business.Abstract;
+using Business.Constants;
+using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs.Response;
@@ -16,25 +18,40 @@ namespace Business.Concrete
             _productDal = productDal;
         }
 
-        public List<Product> GetAll()
+        public IResult Add(Product product)
         {
-            return _productDal.GetAll();
+            if (product.ProductName.Length < 3)
+                return new ErrorResult(Messages.ProductNameInvalid);
+            _productDal.Add(product);
+            return new SuccessResult(Messages.ProductAdded);
         }
 
-        public List<Product> GetAllByCategoryId(int categoryId)
+        public IDataResult<List<Product>> GetAll()
         {
-            return _productDal.GetAll(p => p.CategoryId == categoryId);
+            if (DateTime.Now.Hour == 23)
+                return new ErrorDataResult();
+
+            return new DataResult<List<Product>>(_productDal.GetAll(), true, Messages.ProductAdded);
         }
 
-        public List<Product> GetByUnitPrice(decimal min, decimal max)
+        public IDataResult<List<Product>> GetAllByCategoryId(int categoryId)
         {
-            return _productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max);
+            return new DataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == categoryId), true, Messages.ProcessCompleted);
         }
 
-        public List<ProductDetailDto> GetProductDetails()
+        public IDataResult<Product> GetById(int productId)
         {
-            return _productDal.GetProductDetails();
+            return new DataResult<Product>(_productDal.Get(p => p.ProductId == productId), true, Messages.ProcessCompleted);
         }
 
+        public IDataResult<List<Product>> GetByUnitPrice(decimal min, decimal max)
+        {
+            return new DataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max), true, Messages.ProcessCompleted);
+        }
+
+        public IDataResult<List<ProductDetailDto>> GetProductDetails()
+        {
+            return new DataResult<List<ProductDetailDto>>(_productDal.GetProductDetails(), true, Messages.ProcessCompleted);
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace ConsoleUI
             ProductManager productManager = new ProductManager(new EfProductDal());
             var products = productManager.GetProductDetails();
 
-            ConsoleTable.From(products).Write();
+            ConsoleTable.From(products.Data).Write();
         }
     }
 }
