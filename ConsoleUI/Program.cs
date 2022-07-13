@@ -19,7 +19,10 @@ namespace ConsoleUI
             CategoryManager categoryManager = new CategoryManager(new EfCategoryDal());
             var categories = categoryManager.GetAll();
 
-            ConsoleTable.From(categories).Write();
+            if (categories.Success)
+                ConsoleTable.From(categories.Data).Write();
+            else
+                Console.WriteLine(categories.Message);
         }
 
         private static void ProductTest()
@@ -27,7 +30,10 @@ namespace ConsoleUI
             ProductManager productManager = new ProductManager(new EfProductDal());
             var products = productManager.GetProductDetails();
 
-            ConsoleTable.From(products.Data).Write();
+            if (products.Success)
+                ConsoleTable.From(products.Data).Write();
+            else
+                Console.WriteLine(products.Message);
         }
     }
 }
