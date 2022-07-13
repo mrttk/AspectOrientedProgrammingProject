@@ -29,29 +29,29 @@ namespace Business.Concrete
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 23)
-                return new ErrorDataResult();
+                return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
 
-            return new DataResult<List<Product>>(_productDal.GetAll(), true, Messages.ProductAdded);
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(), Messages.ProductsListed);
         }
 
         public IDataResult<List<Product>> GetAllByCategoryId(int categoryId)
         {
-            return new DataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == categoryId), true, Messages.ProcessCompleted);
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == categoryId), Messages.ProcessCompleted);
         }
 
         public IDataResult<Product> GetById(int productId)
         {
-            return new DataResult<Product>(_productDal.Get(p => p.ProductId == productId), true, Messages.ProcessCompleted);
+            return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == productId), Messages.ProcessCompleted);
         }
 
         public IDataResult<List<Product>> GetByUnitPrice(decimal min, decimal max)
         {
-            return new DataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max), true, Messages.ProcessCompleted);
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max), Messages.ProcessCompleted);
         }
 
         public IDataResult<List<ProductDetailDto>> GetProductDetails()
         {
-            return new DataResult<List<ProductDetailDto>>(_productDal.GetProductDetails(), true, Messages.ProcessCompleted);
+            return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails(), Messages.ProcessCompleted);
         }
     }
 }
