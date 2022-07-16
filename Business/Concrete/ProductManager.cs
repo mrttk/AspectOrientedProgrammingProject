@@ -11,20 +11,31 @@ using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
+using Core.Utilities.Business;
 
 namespace Business.Concrete
 {
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
-        public ProductManager(IProductDal productDal)
+        ICategoryDal _categoryDal;
+        public ProductManager(IProductDal productDal, ICategoryDal categoryDal)
         {
             _productDal = productDal;
+            _categoryDal = categoryDal;
         }
 
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
+            IResult result = BusinessRules.Run(
+                CheckIfProductCountOfCategoryCorrect(product.CategoryId),
+                CheckIfProductNameExist(product.ProductName),
+                CheckCategoryCount());
+            if (result != null)
+                return result;
+
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
         }
@@ -54,6 +65,34 @@ namespace Business.Concrete
             if (DateTime.Now.Hour == 23)
                 return new ErrorDataResult<List<ProductDetailDto>>(Messages.MaintenanceTime);
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails(), Messages.ProcessCompleted);
+        }
+
+        private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
+        {
+            var result = _productDal.GetAll(p => p.CategoryId == categoryId).Count;
+            if (result >= 10)
+                return new ErrorResult(Messages.ProductCountOfCategoryError);
+            return new SuccessResult();
+        }
+
+        private IResult CheckIfProductNameExist(string productName)
+        {
+            var result = _productDal.GetAll(p => p.ProductName == productName).Any();
+            if (result)
+            {
+                return new ErrorResult(Messages.ProductNameAlreadyExist);
+            }
+            return new SuccessResult();
+        }
+
+        private IResult CheckCategoryCount()
+        {
+            var result = _categoryDal.GetAll().Count();
+            if (result>=15)
+            {
+                return new ErrorResult(Messages.OutOfRangeError);
+            }
+            return new SuccessResult();
         }
     }
 }
